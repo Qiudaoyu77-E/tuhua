@@ -11,6 +11,10 @@ const providers = {
     label: "Google Gemini",
     models: ["gemini-2.0-flash-preview-image-generation"],
   },
+  qwen: {
+    label: "通义千问（百炼）",
+    models: ["qwen-image-edit-plus", "qwen-image-2.0-pro"],
+  },
   openrouter: {
     label: "OpenRouter",
     models: [
@@ -61,6 +65,7 @@ function inferProviderByKey(key) {
   if (!key) return "auto";
   if (key.startsWith("sk-ant-")) return "anthropic";
   if (key.startsWith("AIza")) return "gemini";
+  if (key.startsWith("dsk-")) return "qwen";
   if (key.startsWith("sk-or-v1-")) return "openrouter";
   if (key.startsWith("sk-")) return "openai";
   return "custom";
@@ -266,6 +271,38 @@ async function runWithModel(providerName, apiKey, model, style, strength) {
     const inlineData = json?.candidates?.[0]?.content?.parts?.find((p) => p.inline_data)?.inline_data;
     if (!inlineData?.data) throw new Error("Gemini 响应中未找到图片");
     return `data:${inlineData.mime_type ?? "image/png"};base64,${inlineData.data}`;
+  }
+
+  if (providerName === "qwen") {
+    const res = await fetch("https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        input: {
+          messages: [
+            {
+              role: "user",
+              content: [{ image: imageDataUrl }, { text: prompt }],
+            },
+          ],
+        },
+        parameters: {
+          n: 1,
+          watermark: false,
+          prompt_extend: true,
+          size: "1024*1024",
+        },
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message ?? json.error?.message ?? "千问请求失败");
+    const imageUrl = json?.output?.choices?.[0]?.message?.content?.find((item) => item.image)?.image;
+    if (!imageUrl) throw new Error("千问响应中未找到图片");
+    return imageUrl;
   }
 
   if (providerName === "openrouter") {
