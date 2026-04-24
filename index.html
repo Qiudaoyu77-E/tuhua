@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 风格转换器</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>图片风格转换工具</h1>
+        <p>支持：线稿 / 日本漫画风格 / 水彩画 / 油画。支持大模型和本地离线模式。</p>
+      </header>
+
+      <section class="panel controls">
+        <div class="field">
+          <label for="imageInput">上传图片</label>
+          <input id="imageInput" type="file" accept="image/*" />
+        </div>
+
+        <div class="field">
+          <label for="apiKey">API Key（可选）</label>
+          <input id="apiKey" type="password" placeholder="输入后自动识别服务商" autocomplete="off" />
+          <small id="providerHint">未输入 Key，将使用本地无大模型模式。</small>
+        </div>
+
+        <div class="field two-col">
+          <div>
+            <label for="provider">服务商</label>
+            <select id="provider">
+              <option value="auto">自动识别</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="gemini">Google Gemini</option>
+              <option value="qwen">通义千问（百炼）</option>
+              <option value="openrouter">OpenRouter</option>
+              <option value="custom">自定义兼容接口</option>
+            </select>
+          </div>
+          <div>
+            <label for="model">模型</label>
+            <select id="model"></select>
+          </div>
+        </div>
+
+        <div class="field" id="customBaseWrap" hidden>
+          <label for="customBaseUrl">自定义 Base URL（OpenAI 兼容）</label>
+          <input id="customBaseUrl" type="url" placeholder="https://api.example.com/v1" />
+        </div>
+
+        <div class="field two-col">
+          <div>
+            <label for="style">风格</label>
+            <select id="style">
+              <option value="line">线稿</option>
+              <option value="manga">日本漫画风格</option>
+              <option value="watercolor">水彩画</option>
+              <option value="oil">油画</option>
+            </select>
+          </div>
+          <div>
+            <label for="strength">风格强度</label>
+            <input id="strength" type="range" min="10" max="100" value="70" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="runBtn">开始转换</button>
+          <button id="downloadBtn" disabled>下载结果</button>
+        </div>
+
+        <p class="note">
+          说明：浏览器直连第三方模型可能受 CORS 限制。如失败，可先使用“本地无大模型模式”，或把请求转发到你自己的后端。
+        </p>
+        <p id="status" class="status">等待上传图片…</p>
+      </section>
+
+      <section class="panel preview">
+        <div>
+          <h2>原图</h2>
+          <canvas id="inputCanvas"></canvas>
+        </div>
+        <div>
+          <h2>结果图</h2>
+          <canvas id="outputCanvas"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
