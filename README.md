@@ -11,6 +11,7 @@
 - 支持上传图片并实时预览。
 - 提供风格选择 + 强度滑块。
 - 支持模型服务商选择（OpenAI / Anthropic / Gemini / 通义千问（百炼） / OpenRouter / 自定义兼容接口）。
+- 支持模型服务商选择（OpenAI / Anthropic / Gemini / OpenRouter / 自定义兼容接口）。
 - 输入 API Key 后可自动识别常见服务商。
 - 不输入 API Key 时可直接使用本地无大模型模式（离线滤镜）。
 - 模型请求失败会自动回退本地模式。
